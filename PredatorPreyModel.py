@@ -15,7 +15,7 @@ number_of_plants = 2
 list_of_plants = []
 plant_statistics = []
 
-predator_color = (0, 255, 255)
+predator_color = (0, 255, 0)
 number_of_predators = 0
 list_of_predators = []
 predator_statistics = []
