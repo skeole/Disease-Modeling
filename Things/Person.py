@@ -45,10 +45,13 @@ class Person(object):
         self.surface = surface
         self.angle = 0
         
+        self.heading = random.random() * 2 * math.pi
+        self.velocity = 10 + random.random() * 10
+        
         if len(givenstats) == 0:
             self.x = random.random() * 800
             self.y = random.random() * 800
-            self.size = random.random() * 5 + 5
+            self.size = random.random() * 10 + 10
             self.height = random.random() * 5 + 5
         else:
             self.x = givenstats[0]
@@ -56,13 +59,37 @@ class Person(object):
             self.size = givenstats[2]
             self.height = givenstats[3]
         
-        self.ListOfPoints = [polygon_for_line((0, 0), (0, 0), self.size, smoothness=2)]
+        self.ListOfPoints = [polygon_for_line((0, 0), (0, 0), self.size, smoothness=3)]
     
     def statistics(self):
         return [self.Alive, self.Kids, self.age, self.x, self.y, self.size, self.height]
     
     def tick(self, person_stats, index):
-        self.age += 1
+        moveNormally = True
+        for i in range(len(person_stats)):
+            if i != index:
+                if math.sqrt((person_stats[i][3] - self.x) * (person_stats[i][3] - self.x) + (person_stats[i][4] - self.y) * (person_stats[i][4] - self.y)) < float(self.size + person_stats[i][5]) / 2.0:
+                    self.Alive = False
+        
+        #motion script at the end
+        if moveNormally:
+            self.heading += (random.random() * 0.2 - 0.1)
+            self.x += self.velocity * math.cos(self.heading)
+            self.y -= self.velocity * math.sin(self.heading)
+            
+            if self.y - float(self.size) / 2.0 < 0:
+                self.y = self.size - self.y
+                self.heading = 0 - self.heading
+            if self.x - float(self.size) / 2.0 < 0:
+                self.x = self.size - self.x
+                self.heading = math.pi - self.heading
+            if self.y + float(self.size) / 2.0 > self.surface.get_height():
+                self.y = 2 * self.surface.get_height() - self.y - self.size
+                self.heading = 0 - self.heading
+            if self.x + float(self.size) / 2.0 > self.surface.get_width():
+                self.x = 2 * self.surface.get_width() - self.x - self.size
+                self.heading = math.pi - self.heading
+            self.age += 1
     
     def update_hitbox(self):
         self.hitbox = []

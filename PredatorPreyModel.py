@@ -38,12 +38,16 @@ for i in range(number_of_prey):
     prey_statistics.append([])
 
 def update_statistics():
-    for i in range(len(list_of_plants)):
-        plant_statistics[i] = copy.deepcopy(list_of_plants[i].statistics())
-    for i in range(len(list_of_predators)):
-        predator_statistics[i] = copy.deepcopy(list_of_predators[i].statistics())
-    for i in range(len(list_of_prey)):
-        prey_statistics[i] = copy.deepcopy(list_of_prey[i].statistics())
+    global plant_statistics, predator_statistics, prey_statistics
+    plant_statistics = []
+    for i in list_of_plants:
+        plant_statistics.append(copy.deepcopy(i.statistics()))
+    predator_statistics = []
+    for i in list_of_predators:
+        predator_statistics.append(copy.deepcopy(i.statistics()))
+    prey_statistics = []
+    for i in list_of_prey:
+        prey_statistics.append(copy.deepcopy(i.statistics()))
 
 def tick():
     global list_of_plants, list_of_predators, list_of_prey

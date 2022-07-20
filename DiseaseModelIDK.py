@@ -9,7 +9,7 @@ clock = pygame.time.Clock()
 background_color = (255, 255, 255)
 
 person_color = (128, 128, 128)
-number_of_people = 2
+number_of_people = 100
 list_of_people = []
 person_statistics = []
 
@@ -18,8 +18,10 @@ for i in range(number_of_people):
     person_statistics.append([])
 
 def update_statistics():
-    for i in range(len(list_of_people)):
-        person_statistics[i] = copy.deepcopy(list_of_people[i].statistics())
+    global person_statistics
+    person_statistics = []
+    for i in list_of_people:
+        person_statistics.append(copy.deepcopy(i.statistics()))
 
 def tick():
     global list_of_people
@@ -34,7 +36,6 @@ def tick():
             temp.append(list_of_people[i])
         for j in person_statistics[i][1]:
             temp.append(Person.Person([person_color], gameDisplay, givenstats=j))
-            person_statistics.append([])
     list_of_people = temp.copy()
     
 run = True
@@ -61,6 +62,6 @@ while run:
         i.draw()
 
     pygame.display.update()
-    clock.tick(10)
+    clock.tick(30)
 
 pygame.quit()
