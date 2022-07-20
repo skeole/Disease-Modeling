@@ -37,7 +37,7 @@ def tick():
         for j in person_statistics[i][1]:
             temp.append(Person.Person([person_color], gameDisplay, givenstats=j))
     list_of_people = temp.copy()
-    
+
 run = True
 pause = False
 

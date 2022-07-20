@@ -71,6 +71,10 @@ class Person(object):
                 if math.sqrt((person_stats[i][3] - self.x) * (person_stats[i][3] - self.x) + (person_stats[i][4] - self.y) * (person_stats[i][4] - self.y)) < float(self.size + person_stats[i][5]) / 2.0:
                     self.Alive = False
         
+        if random.random() > 0.9:
+            self.size += 1
+            self.ListOfPoints = [polygon_for_line((0, 0), (0, 0), self.size, smoothness=3)]
+
         #motion script at the end
         if moveNormally:
             self.heading += (random.random() * 0.2 - 0.1)
