@@ -39,50 +39,56 @@ def polygon_for_line(point_1, point_2, width, smoothness=4):
 def distance(thing1, thing2): #returns distance between them - not distance between centers
     return math.sqrt((thing1[3] - thing2[3]) * (thing1[3] - thing2[3]) + (thing1[4] - thing2[4]) * (thing1[4] - thing2[4])) - 0.5 * (thing1[5] + thing2[5])
 
-class Plant(object):
+class Thing(object):
     def __init__(self, ListOfColors, surface, givenstats=[]):
         self.Alive = True
         self.Kids = []
         self.age = 0
+        
         self.initialColor = ListOfColors[0]
         self.ListOfColors = ListOfColors
         self.surface = surface
         self.angle = 0
         
+        self.heading = random.random() * 2 * math.pi
+        self.velocity = 0
+        
         if len(givenstats) == 0:
             self.x = surface.get_width() * (0.1 + random.random() * 0.8)
             self.y = surface.get_height() * (0.1 + random.random() * 0.8)
             self.size = random.random() * 10 + 20
-            self.height = random.random() * 5 + 5
         else:
             self.x = givenstats[0]
             self.y = givenstats[1]
             self.size = givenstats[2]
-            self.height = givenstats[3]
         
-        self.numFruit = 0
-        for i in range(3):
-            if random.random() > 0.5:
-                self.numFruit += 1
-        self.ListOfPoints = [polygon_for_line((0, 0), (0, 0), self.size, smoothness=2)]
+        self.smoothness = min(max(int(self.size / 5.0) - 1, 2), 4)
+        
+        self.ListOfPoints = [polygon_for_line((0, 0), (0, 0), self.size, smoothness=self.smoothness)]
     
-    def statistics(self):
-        return [self.Alive, self.Kids, self.age, self.x, self.y, self.size, self.height, self.numFruit]
+    def basic_statistics(self):
+        return [self.Alive, self.Kids, self.age, self.x, self.y, self.size]
     
-    def tick(self, plant_stats, predator_stats, prey_stats, index):
-        if (random.random() > 0.95) and (self.numFruit < 4):
-            self.numFruit += 1
-        for i in prey_stats:
-            print(distance(self.statistics(), i))
-            if (distance(self.statistics(), i) < 5) and (self.numFruit > 0):
-                self.numFruit -= 1
+    def basic_tick(self, moveNormally):
+        if moveNormally:
+            self.heading += (random.random() * 0.4 - 0.2)
+        
+        self.x += self.velocity * math.cos(self.heading)
+        self.y -= self.velocity * math.sin(self.heading)
+        
+        if self.y - float(self.size) / 2.0 < 0:
+            self.y = self.size - self.y
+            self.heading = 0 - self.heading
+        if self.x - float(self.size) / 2.0 < 0:
+            self.x = self.size - self.x
+            self.heading = math.pi - self.heading
+        if self.y + float(self.size) / 2.0 > self.surface.get_height():
+            self.y = 2 * self.surface.get_height() - self.y - self.size
+            self.heading = 0 - self.heading
+        if self.x + float(self.size) / 2.0 > self.surface.get_width():
+            self.x = 2 * self.surface.get_width() - self.x - self.size
+            self.heading = math.pi - self.heading
         self.age += 1
-        
-        self.ListOfColors = [self.initialColor]
-        self.ListOfPoints = [polygon_for_line((0, 0), (0, 0), self.size, smoothness=2)]
-        for i in range(self.numFruit):
-            self.ListOfColors.append((0, 0, 0))
-            self.ListOfPoints.append(polygon_for_line((self.size * math.cos(i / 2.0 * math.pi), self.size * math.sin(i / 2.0 * math.pi)), (self.size * math.cos(i / 2.0 * math.pi), self.size * math.sin(i / 2.0 * math.pi)), 2, smoothness=2))
     
     def update_hitbox(self):
         self.hitbox = []

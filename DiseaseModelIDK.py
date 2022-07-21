@@ -1,6 +1,7 @@
 import pygame
 import copy
 
+import Things.Thing as Thing
 import Things.Person as Person
 
 pygame.init()
@@ -62,6 +63,6 @@ while run:
         i.draw()
 
     pygame.display.update()
-    clock.tick(30)
+    clock.tick(10)
 
 pygame.quit()

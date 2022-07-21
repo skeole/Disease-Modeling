@@ -36,6 +36,9 @@ def polygon_for_line(point_1, point_2, width, smoothness=4):
     
     return polygon
 
+def distance(thing1, thing2):
+    return math.sqrt((thing1[3] - thing2[3]) * (thing1[3] - thing2[3]) + (thing1[4] - thing2[4]) * (thing1[4] - thing2[4])) - 0.5 * (thing1[5] + thing2[5])
+
 class Prey(object):
     def __init__(self, ListOfColors, surface, givenstats=[]):
         self.Alive = True
@@ -45,11 +48,14 @@ class Prey(object):
         self.surface = surface
         self.angle = 0
         
-        self.maxAge = random.random() * 80
+        self.heading = random.random() * 2 * math.pi
+        self.velocity = 10 + random.random() * 10
+        
+        self.maxAge = 9999999999 #80 + random.random() * 80
         if len(givenstats) == 0:
-            self.x = random.random() * 800
-            self.y = random.random() * 800
-            self.size = random.random() * 5 + 5
+            self.x = surface.get_width() * (0.1 + random.random() * 0.8)
+            self.y = surface.get_height() * (0.1 + random.random() * 0.8)
+            self.size = random.random() * 10 + 20
             self.height = random.random() * 5 + 5
         else:
             self.x = givenstats[0]
@@ -63,11 +69,42 @@ class Prey(object):
         return [self.Alive, self.Kids, self.age, self.x, self.y, self.size, self.height]
     
     def tick(self, plant_stats, predator_stats, prey_stats, index):
+        self.Kids = []
+        moveNormally = True
+        if random.random() > 0.9999:
+            self.Kids = [[]]
+        for i in plant_stats:
+            if (distance(self.statistics(), i) < 5):
+                temp = 0
+                for j in range(index):
+                    if distance(prey_stats[j], i) < 5:
+                        temp += 1
+                if temp < i[7]:
+                    moveNormally = False
+                    self.Alive = False
+        
+        #motion script at the end so we can decide how we want to change velocity/angle
+        if moveNormally:
+            self.heading += (random.random() * 0.4 - 0.2)
+        
+        self.x += self.velocity * math.cos(self.heading)
+        self.y -= self.velocity * math.sin(self.heading)
+        
+        if self.y - float(self.size) / 2.0 < 0:
+            self.y = self.size - self.y
+            self.heading = 0 - self.heading
+        if self.x - float(self.size) / 2.0 < 0:
+            self.x = self.size - self.x
+            self.heading = math.pi - self.heading
+        if self.y + float(self.size) / 2.0 > self.surface.get_height():
+            self.y = 2 * self.surface.get_height() - self.y - self.size
+            self.heading = 0 - self.heading
+        if self.x + float(self.size) / 2.0 > self.surface.get_width():
+            self.x = 2 * self.surface.get_width() - self.x - self.size
+            self.heading = math.pi - self.heading
         self.age += 1
         if self.age > self.maxAge:
             self.Alive = False
-        if random.random() > 0.9:
-            self.Kids = [[]]
     
     def update_hitbox(self):
         self.hitbox = []

@@ -36,6 +36,9 @@ def polygon_for_line(point_1, point_2, width, smoothness=4):
     
     return polygon
 
+def distance(thing1, thing2):
+    return math.sqrt((thing1[3] - thing2[3]) * (thing1[3] - thing2[3]) + (thing1[4] - thing2[4]) * (thing1[4] - thing2[4])) - 0.5 * (thing1[5] + thing2[5])
+
 class Predator(object):
     def __init__(self, ListOfColors, surface, givenstats=[]):
         self.Alive = True
@@ -46,8 +49,8 @@ class Predator(object):
         self.angle = 0
         
         if len(givenstats) == 0:
-            self.x = random.random() * 800
-            self.y = random.random() * 800
+            self.x = surface.get_width() * (0.1 + random.random() * 0.8)
+            self.y = surface.get_height() * (0.1 + random.random() * 0.8)
             self.size = random.random() * 5 + 5
             self.height = random.random() * 5 + 5
         else:
@@ -59,7 +62,7 @@ class Predator(object):
         self.ListOfPoints = [polygon_for_line((0, 0), (0, 0), self.size, smoothness=2)]
     
     def statistics(self):
-        return [self.Alive, self.Kids, self.age, self.x, self.y, self.size, self.height]
+        return [self.Alive, self.Kids, self.age, self.x, self.y, self.size, self.height, self.numFruit]
     
     def tick(self, plant_stats, predator_stats, prey_stats, index):
         self.age += 1
