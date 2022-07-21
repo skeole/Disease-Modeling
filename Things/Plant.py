@@ -1,100 +1,38 @@
-import pygame
 import math
 import random
+import Things.Thing as Thing
 
-def polygon_for_line(point_1, point_2, width, smoothness=4):
-    radius = float(width)/2
-    if point_1[0] == point_2[0]:
-        x_min = point_1[0]
-        y_min = min(point_1[1], point_2[1])
-        x_max = point_1[0]
-        y_max = max(point_1[1], point_2[1])
-        angle = math.pi/2
-    else:
-        if point_1[0] < point_2[0]:
-            x_min = point_1[0]
-            y_min = point_1[1]
-            x_max = point_2[0]
-            y_max = point_2[1]
-        else:
-            x_max = point_1[0]
-            y_max = point_1[1]
-            x_min = point_2[0]
-            y_min = point_2[1]
-        angle = math.atan((y_max-y_min)/(x_max-x_min))
-    
-    polygon = []
-    
-    angle_modifier = -math.pi/2
-    for i in range(smoothness+1):
-        polygon.append((x_max + radius * math.cos(angle + angle_modifier), y_max + radius * math.sin(angle + angle_modifier)))
-        angle_modifier += math.pi/smoothness
-    angle_modifier -= math.pi/smoothness
-    for i in range(smoothness+1):
-        polygon.append((x_min + radius * math.cos(angle + angle_modifier), y_min + radius * math.sin(angle + angle_modifier)))
-        angle_modifier += math.pi/smoothness
-    
-    return polygon
-
-def distance(thing1, thing2): #returns distance between them - not distance between centers
-    return math.sqrt((thing1[3] - thing2[3]) * (thing1[3] - thing2[3]) + (thing1[4] - thing2[4]) * (thing1[4] - thing2[4])) - 0.5 * (thing1[5] + thing2[5])
-
-class Plant(object):
+class Plant(Thing.Thing):
     def __init__(self, ListOfColors, surface, givenstats=[]):
-        self.Alive = True
-        self.Kids = []
-        self.age = 0
-        self.initialColor = ListOfColors[0]
-        self.ListOfColors = ListOfColors
-        self.surface = surface
-        self.angle = 0
+        super().__init__(ListOfColors, surface, givenstats)
         
         if len(givenstats) == 0:
-            self.x = surface.get_width() * (0.1 + random.random() * 0.8)
-            self.y = surface.get_height() * (0.1 + random.random() * 0.8)
-            self.size = random.random() * 10 + 20
             self.height = random.random() * 5 + 5
         else:
-            self.x = givenstats[0]
-            self.y = givenstats[1]
-            self.size = givenstats[2]
             self.height = givenstats[3]
         
         self.numFruit = 0
         for i in range(3):
             if random.random() > 0.5:
                 self.numFruit += 1
-        self.ListOfPoints = [polygon_for_line((0, 0), (0, 0), self.size, smoothness=2)]
     
     def statistics(self):
-        return [self.Alive, self.Kids, self.age, self.x, self.y, self.size, self.height, self.numFruit]
+        temp = super().basic_statistics() #Alive, Kids, age, x, y, size
+        temp.append(self.height)
+        temp.append(self.numFruit)
+        return temp
     
     def tick(self, plant_stats, predator_stats, prey_stats, index):
         if (random.random() > 0.95) and (self.numFruit < 4):
             self.numFruit += 1
         for i in prey_stats:
-            print(distance(self.statistics(), i))
-            if (distance(self.statistics(), i) < 5) and (self.numFruit > 0):
+            if (Thing.distance(self.statistics(), i) < 20) and (self.numFruit > 0):
                 self.numFruit -= 1
-        self.age += 1
         
-        self.ListOfColors = [self.initialColor]
-        self.ListOfPoints = [polygon_for_line((0, 0), (0, 0), self.size, smoothness=2)]
+        super().basic_tick(False)
+        
+        self.ListOfColors = self.initialColors
+        self.ListOfPoints = [Thing.polygon_for_line((0, 0), (0, 0), self.size, smoothness=self.smoothness)]
         for i in range(self.numFruit):
             self.ListOfColors.append((0, 0, 0))
-            self.ListOfPoints.append(polygon_for_line((self.size * math.cos(i / 2.0 * math.pi), self.size * math.sin(i / 2.0 * math.pi)), (self.size * math.cos(i / 2.0 * math.pi), self.size * math.sin(i / 2.0 * math.pi)), 2, smoothness=2))
-    
-    def update_hitbox(self):
-        self.hitbox = []
-        for i in self.ListOfPoints: #for every shape in ListOfPoints
-            polygon = []
-            for j in i:
-                point = (self.x+j[0]*math.cos(self.angle)-j[1]*math.sin(self.angle), 
-                         self.y+j[0]*math.sin(self.angle)+j[1]*math.cos(self.angle))
-                polygon.append(point) #in form [(x1, y1), (x2, y2), ...]
-            self.hitbox.append(polygon)
-    
-    def draw(self):
-        self.update_hitbox()
-        for i in range(len(self.hitbox)): #for every shape in the hitbox
-            pygame.draw.polygon(self.surface, self.ListOfColors[i], self.hitbox[i])
+            self.ListOfPoints.append(Thing.polygon_for_line((self.size * math.cos(i / 2.0 * math.pi), self.size * math.sin(i / 2.0 * math.pi)), (self.size * math.cos(i / 2.0 * math.pi), self.size * math.sin(i / 2.0 * math.pi)), 5, smoothness=2))

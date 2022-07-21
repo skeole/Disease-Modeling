@@ -11,7 +11,7 @@ clock = pygame.time.Clock()
 background_color = (255, 255, 255)
 
 plant_color = (255, 0, 0)
-number_of_plants = 1
+number_of_plants = 2
 list_of_plants = []
 plant_statistics = []
 
@@ -21,7 +21,7 @@ list_of_predators = []
 predator_statistics = []
 
 prey_color = (0, 0, 255)
-number_of_prey = 3
+number_of_prey = 15
 list_of_prey = []
 prey_statistics = []
 
@@ -119,6 +119,6 @@ while run:
         i.draw()
 
     pygame.display.update()
-    clock.tick(10)
+    clock.tick(25)
 
 pygame.quit()

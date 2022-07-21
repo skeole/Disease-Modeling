@@ -39,13 +39,25 @@ def polygon_for_line(point_1, point_2, width, smoothness=4):
 def distance(thing1, thing2): #returns distance between them - not distance between centers
     return math.sqrt((thing1[3] - thing2[3]) * (thing1[3] - thing2[3]) + (thing1[4] - thing2[4]) * (thing1[4] - thing2[4])) - 0.5 * (thing1[5] + thing2[5])
 
+def direction(thing1, thing2): #direction from thing1 to thing2
+    if thing1[3] == thing2[3]:
+        if thing1[4] < thing2[4]:
+            return 3.0 * math.pi / 2.0
+        else:
+            return math.pi / 2.0
+    angle = 0
+    if thing1[3] > thing2[3]:
+        angle = math.pi
+    angle -= math.atan((thing1[4] - thing2[4]) / (thing1[3] - thing2[3]))
+    return angle
+
 class Thing(object):
     def __init__(self, ListOfColors, surface, givenstats=[]):
         self.Alive = True
         self.Kids = []
         self.age = 0
         
-        self.initialColor = ListOfColors[0]
+        self.initialColors = ListOfColors.copy()
         self.ListOfColors = ListOfColors
         self.surface = surface
         self.angle = 0
@@ -70,24 +82,25 @@ class Thing(object):
         return [self.Alive, self.Kids, self.age, self.x, self.y, self.size]
     
     def basic_tick(self, moveNormally):
-        if moveNormally:
-            self.heading += (random.random() * 0.4 - 0.2)
-        
-        self.x += self.velocity * math.cos(self.heading)
-        self.y -= self.velocity * math.sin(self.heading)
-        
-        if self.y - float(self.size) / 2.0 < 0:
-            self.y = self.size - self.y
-            self.heading = 0 - self.heading
-        if self.x - float(self.size) / 2.0 < 0:
-            self.x = self.size - self.x
-            self.heading = math.pi - self.heading
-        if self.y + float(self.size) / 2.0 > self.surface.get_height():
-            self.y = 2 * self.surface.get_height() - self.y - self.size
-            self.heading = 0 - self.heading
-        if self.x + float(self.size) / 2.0 > self.surface.get_width():
-            self.x = 2 * self.surface.get_width() - self.x - self.size
-            self.heading = math.pi - self.heading
+        if self.velocity != 0:
+            if moveNormally:
+                self.heading += (random.random() * 0.4 - 0.2)
+            
+            self.x += self.velocity * math.cos(self.heading)
+            self.y -= self.velocity * math.sin(self.heading)
+            
+            if self.y - float(self.size) / 2.0 < 0:
+                self.y = self.size - self.y
+                self.heading = 0 - self.heading
+            if self.x - float(self.size) / 2.0 < 0:
+                self.x = self.size - self.x
+                self.heading = math.pi - self.heading
+            if self.y + float(self.size) / 2.0 > self.surface.get_height():
+                self.y = 2 * self.surface.get_height() - self.y - self.size
+                self.heading = 0 - self.heading
+            if self.x + float(self.size) / 2.0 > self.surface.get_width():
+                self.x = 2 * self.surface.get_width() - self.x - self.size
+                self.heading = math.pi - self.heading
         self.age += 1
     
     def update_hitbox(self):
