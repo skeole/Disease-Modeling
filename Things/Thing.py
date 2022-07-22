@@ -82,6 +82,7 @@ class Thing(object):
         return [self.Alive, self.Kids, self.age, self.x, self.y, self.size]
     
     def basic_tick(self, moveNormally):
+        self.size = max(min(self.size, self.surface.get_height() / 2.0), 0)
         if self.velocity != 0:
             if moveNormally:
                 self.heading += (random.random() * 0.4 - 0.2)

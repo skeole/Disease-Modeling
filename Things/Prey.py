@@ -22,10 +22,10 @@ class Prey(Thing.Thing):
     def tick(self, plant_stats, predator_stats, prey_stats, index):
         self.Kids = []
         moveNormally = True
-        if random.random() > 0.9999:
+        if random.random() > 0.998:
             self.Kids = [[]]
         for i in plant_stats:
-            if (Thing.distance(self.statistics(), i) < 80) and (i[7] > 0):
+            if (Thing.distance(self.statistics(), i) < 240) and (i[7] > 0):
                 temp = 0
                 self.heading = Thing.direction(self.statistics(), i)
                 for j in range(index):

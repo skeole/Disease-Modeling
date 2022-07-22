@@ -3,16 +3,18 @@ import random
 import Things.Thing as Thing
 
 class Person(Thing.Thing):
-    def __init__(self, ListOfColors, surface, givenstats=[]):
+    def __init__(self, ListOfColors, surface, name="G", givenstats=[]):
         super().__init__(ListOfColors, surface, givenstats)
         
         self.velocity = 10 + random.random() * 10
         
+        self.name = name
         self.height = 0
         
     def statistics(self):
         temp = super().basic_statistics() #Alive, Kids, age, x, y, size
         temp.append(self.height)
+        temp.append(self.name)
         return temp
     
     def tick(self, person_stats, index):
@@ -20,7 +22,10 @@ class Person(Thing.Thing):
         for i in range(len(person_stats)):
             if i != index:
                 if Thing.distance(person_stats[i], self.statistics()) < 0:
-                    self.Alive = False
+                    if (self.size < person_stats[i][5]) or ((self.size == person_stats[i][5]) and (index < i)):
+                        self.Alive = False
+                    else:
+                        self.size += 0.1 * person_stats[i][5]
         
         if random.random() > 0.9:
             self.size += 1
