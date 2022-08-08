@@ -15,18 +15,22 @@ class Plant(Thing.Thing):
         for i in range(3):
             if random.random() > 0.5:
                 self.numFruit += 1
+        self.preythateatfruit = []
     
     def statistics(self):
         temp = super().basic_statistics() #Alive, Kids, age, x, y, size
         temp.append(self.height)
         temp.append(self.numFruit)
+        temp.append(self.preythateatfruit)
         return temp
     
     def tick(self, plant_stats, predator_stats, prey_stats, index):
         if (random.random() > 0.95) and (self.numFruit < 4):
             self.numFruit += 1
-        for i in prey_stats:
-            if (Thing.distance(self.statistics(), i) < 20) and (self.numFruit > 0):
+        self.preythateatfruit = []
+        for i in range(len(prey_stats)):
+            if (Thing.distance(self.statistics(), prey_stats[i]) < 20) and (self.numFruit > 0):
+                self.preythateatfruit.append(i)
                 self.numFruit -= 1
         
         super().basic_tick(False)

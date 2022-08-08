@@ -1,13 +1,17 @@
-with open("Names.txt") as file:
-    l = list(file)
-print(l)
-d = []
-for i in l:
-    temp = i
-    temp.strip()
-    temp = temp.split("\t")
-    print(temp)
-    d.append(temp[1])
-    d.append(temp[3])
+class a(object):
+    def __init__(self, name):
+        self.name = name
+    def p(self):
+        print(self.name)
 
-print(d)
+class b(object):
+    def __init__(self, name):
+        self.name = name
+    def p(self):
+        print(self.name + " sucks")
+
+l = [a, b]
+
+for i in l:
+    c = i("shaan")
+    c.p()

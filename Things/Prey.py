@@ -14,9 +14,12 @@ class Prey(Thing.Thing):
         else:
             self.height = givenstats[3]
         
+        self.nearbyplants = []
+        
     def statistics(self):
         temp = super().basic_statistics()
         temp.append(self.height)
+        temp.append(self.nearbyplants)
         return temp
     
     def tick(self, plant_stats, predator_stats, prey_stats, index):
@@ -24,16 +27,15 @@ class Prey(Thing.Thing):
         moveNormally = True
         if random.random() > 0.998:
             self.Kids = [[]]
-        for i in plant_stats:
-            if (Thing.distance(self.statistics(), i) < 240) and (i[7] > 0):
-                temp = 0
-                self.heading = Thing.direction(self.statistics(), i)
-                for j in range(index):
-                    if Thing.distance(prey_stats[j], i) < 20:
-                        temp += 1
-                if temp < i[7] and Thing.distance(self.statistics(), i) < 20:
-                    moveNormally = False
-                    self.Alive = False
+        self.nearbyplants = []
+        for i in range(len(plant_stats)):
+            if Thing.distance(self.statistics(), plant_stats[i]) < 240:
+                self.heading = Thing.direction(self.statistics(), plant_stats[i])
+            if Thing.distance(self.statistics(), plant_stats[i]) < 20:
+                self.nearbyplants.append(i)
+            if index in plant_stats[i][8]:
+                moveNormally = False
+                self.Alive = False
         
         #motion script at the end so we can decide how we want to change velocity/angle
         super().basic_tick(moveNormally)

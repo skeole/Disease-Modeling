@@ -69,6 +69,6 @@ while run:
         t = False
     
     pygame.display.update()
-    clock.tick(30)
+    clock.tick(80)
 
 pygame.quit()
